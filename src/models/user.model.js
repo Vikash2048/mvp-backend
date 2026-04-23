@@ -26,10 +26,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     },
-    // --- AUTH FIELDS ADDED BELOW ---
-    refreshTokens: {
-      type: [String],
-    },
+
+    refreshTokens: [
+      {
+        token: String,
+        device: String,
+        ip: String,
+        createdAt: Date
+      },
+    ],
     date_of_birth: { type: Date },
   },
   { timestamps: true }, // Automatically manages createdAt and updatedAt

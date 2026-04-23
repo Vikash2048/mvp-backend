@@ -10,10 +10,14 @@ export const createNewUser = (phone) => {
     return newUser;
 }
 
-export const insertRefreshToken = (id, refreshToken) => {
-    User.updateOne({_id: id}, {$set: {refreshTokens: refreshToken}});
+export const addRefreshToken = (userId, refreshToken, device, ip, createdAt ) => {
+    User.updateOne({_id: userId}, {$set: {refreshTokens: {token: refreshToken, device: device, ip: ip, createdAt}}});
 }
 
-export const findById = (id) => {
-    return user = user.find({_id: id});
+export const findById = (userId) => {
+    return user = user.find({_id: userId});
+}
+
+export const removeRefreshToken = (userId, token) => {
+    User.updateOne({_id: userId}, {$pull: {refreshToken: token}});
 }

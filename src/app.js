@@ -1,10 +1,10 @@
 import express from "express";
-import { authrouter } from "./modules/auth/auth.routes.js";
 import tourSlotRouter from "./routes/retreateSlot.routes.js";
 import tourPackageRoutes from "./routes/retreatPackages.routes.js";
 import tourBookingRouter from "./routes/retreatBooking.routes.js";
 import journalRouter from "./routes/journal.routes.js";
-import authRoutes from "./routes/user.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import therapistRouter from "./routes/therapists.routes.js";
 import therapistBookingRouter from "./routes/therapistBooking.routes.js";
 import { globalErrorHandler } from "./middlewares/error.middleware.js";
@@ -41,6 +41,7 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/tour-packages", tourPackageRoutes);
 app.use("/api/tour-slots", tourSlotRouter);

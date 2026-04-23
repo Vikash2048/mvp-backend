@@ -12,22 +12,7 @@ export const generateRefreshToken = (user) => {
     return jwt.sign({ id: user.id}, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY,});
 };
 
-export const authenticateRefreshToken = async(refreshToken) => {
-    let decode;
-
-    try{
-        decode = jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET);
-    } catch(err){
-        throw new AppError("Refresh token expired or invalid!!");
-    }
-
-    const user = await userRepo.findById(decode.id);
-
-    if (!user || !user.refreshTokens.includes(refreshToken)) {
-        throw new AppError("Invalid refresh token", 403);
-    }
-
-    const newAccessToken = generateAccessToken(user);
-
-    return newAccessToken;
+export const verifyToken = (refreshToken) => {
+    return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 }
+
