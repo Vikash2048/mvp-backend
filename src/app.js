@@ -49,6 +49,7 @@ app.use("/api/tour-booking", tourBookingRouter);
 app.use("/api/journals", journalRouter);
 app.use("/api/therapist", therapistRouter);
 app.use("/api/therapist-booking", therapistBookingRouter);
+
 app.use(globalErrorHandler);
 
 export default app;

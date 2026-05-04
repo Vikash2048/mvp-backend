@@ -5,7 +5,7 @@ import  {
   validateBody,
 } from "../middlewares/validation.js";
 import { createBooking, getBookingById,getAllBookings, confirmedBooking, cancelBooking } from "../controllers/therapistBooking.controller.js";
-import { authMiddleware } from "../utils/jwt.util.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const therapistBookingRouter = express.Router();
 

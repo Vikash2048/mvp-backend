@@ -4,7 +4,6 @@ import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
 import otpModel from "../models/otp.model.js";
-import { authenticateRefreshToken, generateAccessToken, generateRefreshToken } from "../utils/jwt.util.js";
 import Avatar from "../models/avatar.model.js";
 import { UserDefinedMessageInstance } from "twilio/lib/rest/api/v2010/account/call/userDefinedMessage.js";
 import { createLogger } from "../utils/logger.js";
@@ -155,45 +154,6 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-const logout = async (req, res) => {
-  try {
-    logger.info({
-      functionName: "logout",
-      method: req.method,
-      endpoint: `${req.method} ${req.originalUrl}`,
-      ip: req.ip,
-    }, "Logout handler hit");
-    const { refreshToken } = req.query; // Mobile apps usually send this in the body
-
-    if (!refreshToken) {
-      return res.status(400).json({ message: "Refresh Token is required" });
-    }
-
-    // Remove the specific refresh token from the user's array in Mongo
-    await User.findOneAndUpdate(
-      { _id: req.user.id },
-      { $pull: { refreshTokens: refreshToken } },
-    );
-
-    // If using cookies (for Web), clear them too
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-    });
-
-    res
-      .status(200)
-      .json({ message: "Logged out successfully from this device." ,status:"success"});
-  } catch (error) {
-    logger.failure("Logout failed", error, {
-      method: req.method,
-      endpoint: `${req.method} ${req.originalUrl}`,
-      ip: req.ip,
-    });
-    res.status(500).json({ message: "Logout failed", error: error.message });
-  }
-};
 
 const updateStreak = async (req, res) => {
   try {
@@ -265,4 +225,4 @@ const updateStreak = async (req, res) => {
 };
 
 
-export { sendOTP,  getAvatars, logout,updateUserProfile, getUserProfile, updateStreak };
+export { sendOTP,  getAvatars, updateUserProfile, getUserProfile, updateStreak };

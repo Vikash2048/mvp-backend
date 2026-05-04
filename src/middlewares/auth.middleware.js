@@ -1,43 +1,43 @@
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import User from "../../models/user.model.js";
-import { createLogger } from "../../utils/logger.js";
+import AppError from "../utils/AppError.js";
+import * as userRepo from "../repository/user.respository.js";
 
-const logger = createLogger({ module: "auth-middleware" });
+dotenv.config({ path: ".env" });
 
-const authMiddleware = async ( req, res, next ) => {
-    try {
-        logger.info({
-            functionName: "authMiddleware",
-            method: req.method,
-            endpoint: `${req.method} ${req.originalUrl}`,
-            ip: req.ip
-        }, "Auth middleware hit");
-        const authHeader = req.header.authorization;
-
-        if (!authHeader || !authHeader.startsWith("Beared ")) {
-            return res.status(401).json({ message: "Unauthorized User"});
+export const authMiddleware = async (req, res, next) => {
+    try{
+        let token;
+        // get token from header
+        if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+            token = req.headers.authorization.split(" ")[1];
         }
 
-        const token = authHeader.split(" ")[1];
+        if (!token){
+            throw new AppError("Not authorized. No token provided.", 401);
+        }
 
-        const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        const user = await User.findById(payload.userId);
+        //verify token
+        let decoded;
+        try{
+            decoded = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        } catch (err) {
+            throw new AppError("Invalid or expired token", 401);
+        }
 
-        if (!user) {
-            return res.status(401).json({ message: "user not found"});
+        //fetch user
+        const user = await userRepo.findById(decoded.id);
+
+        if(!user){
+            throw new AppError("User not found", 401);
         }
 
         req.user = user;
-        next();
-    }
-    catch (err) {
-        logger.failure("Error verifying token", err, {
-            method: req.method,
-            endpoint: `${req.method} ${req.originalUrl}`,
-            ip: req.ip
-        });
-        return res.status(401).json({ message: "Invalid or expired token"});
-    }
-};
 
-export default authMiddleware;
+        req.log.info({userId: user._id,}, "User authenticated");
+
+        next();
+    } catch (err) {
+        next(err); // send to global errorhandler
+    }
+}

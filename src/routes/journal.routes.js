@@ -1,7 +1,7 @@
 import express from "express";
 import { createJournal, deleteJournalById, getAllJournals, getJournalById, getJournalTags, updateJournalById } from "../controllers/journal.controller.js";
 import { createJournalSchema, updateJournalSchema, validateBody } from "../middlewares/validation.js";
-import { authMiddleware } from "../utils/jwt.util.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const journalRouter = express.Router();
 

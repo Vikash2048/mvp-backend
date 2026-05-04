@@ -7,7 +7,7 @@ import {
   confirmedBooking,
 } from "../controllers/retreatBooking.controller.js";
 import { createBookingSchema, validateBody } from "../middlewares/validation.js";
-import { authMiddleware } from "../utils/jwt.util.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const retreatBookingRouter = express.Router();
 

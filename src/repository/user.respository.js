@@ -4,20 +4,24 @@ export const findByPhone = (phone) => {
     return User.findOne({phone});
 }
 
-export const createNewUser = (phone) => {
+export const createNewUser = async (phone) => {
     const newUser = new User({phone, refreshTokens: []});
-    newUser.save();
+    await newUser.save();
     return newUser;
 }
 
-export const addRefreshToken = (userId, refreshToken, device, ip, createdAt ) => {
-    User.updateOne({_id: userId}, {$set: {refreshTokens: {token: refreshToken, device: device, ip: ip, createdAt}}});
+export const addRefreshToken = async (userId,token, device, ip) => {
+    const userdbresponse = await User.updateOne({_id: userId}, {$push: {refreshTokens: {token, device: device, ip: ip}}});
 }
 
 export const findById = (userId) => {
-    return user = user.find({_id: userId});
+    return User.findById(userId);
 }
 
-export const removeRefreshToken = (userId, token) => {
-    User.updateOne({_id: userId}, {$pull: {refreshToken: token}});
+export const removeRefreshToken = async (userId, token) => {
+    await User.findByIdAndUpdate(userId, {$pull: {refreshTokens: {token}}});
+}
+
+export const clearRefreshTokens = async (userId) => {
+    await User.findByIdAndUpdate(userId, {$pull: {refreshTokens: []}});
 }

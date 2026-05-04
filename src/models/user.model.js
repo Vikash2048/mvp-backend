@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
         token: String,
         device: String,
         ip: String,
-        createdAt: Date
+        createdAt: {type: Date,default: Date.now}
       },
     ],
     date_of_birth: { type: Date },

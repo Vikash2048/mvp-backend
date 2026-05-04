@@ -1,12 +1,12 @@
 import * as jwtService from "../services/jwt.service.js";
 import * as otpRepo from "../repository/otp.respository.js";
 import * as userRepo from "../repository/user.respository.js";
-
+import AppError from "../utils/AppError.js";
 import bcrypt from "bcrypt";
 
 
 /* VERIFY OTP */
-export const verifyOTP = async({phone, otp}) => {
+export const verifyOTP = async({phone, otp}, device, ip) => {
     if(!phone || !otp){
         throw new AppError("Empty field detected!!", 400);
     }
@@ -34,23 +34,17 @@ export const verifyOTP = async({phone, otp}) => {
     if (!user){
         user = await userRepo.createNewUser(phone);
     }
-
     const accessToken = jwtService.generateAccessToken(user);
     const refreshToken = jwtService.generateRefreshToken(user);
-
-    // for track multiple device storing ip with respective to refreshtoken
-    const device = req.headers["user-agent"];
-    const ip = req.ip;
-
+    
+  
     // pushing refresh token to user model in DB
-    await userRepo.addRefreshToken(user.id, {
-        token: refreshToken,
+    await userRepo.addRefreshToken(user._id, 
+        refreshToken,
         device,
         ip,
-        createdAt: new Date(),
-    });
+    );
 
-    console.log("user: ", user);
 
     const userObj = user.toObject();
     delete userObj.refreshTokens;
@@ -75,7 +69,7 @@ export const authenticateRefreshToken = async(refreshToken) => {
         throw new AppError("Invalid refresh token", 403);
     }
 
-    const newAccessToken = generateAccessToken(user);
+    const newAccessToken = jwtService.generateAccessToken(user);
 
     return newAccessToken;
 }
@@ -118,7 +112,6 @@ export const rotateRefreshToken = async (oldToken, device, ip) => {
     token: newRefreshToken,
     device: tokenRecord.device || device,
     ip: ip,
-    createdAt: new Date(),
   });
 
   return {
@@ -126,3 +119,13 @@ export const rotateRefreshToken = async (oldToken, device, ip) => {
     refreshToken: newRefreshToken,
   };
 };
+
+/*LOGOUT FROM SINGLE DEVICE */  
+export const logout = async (userId, token) => {
+  await userRepo.removeRefreshToken(userId, token);
+}
+
+/* LOGOUT FROM ALL DEVICE */
+export const logoutAll = async (userId) => {
+  await userRepo.clearRefreshTokens(userId);
+}
