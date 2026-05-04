@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 const avatarSchema = new mongoose.Schema(
     {
-        url: { type: String, required: true },
-        name: { type: String, required: true },
-
+        seed: { type: String, required: true }, // unique
+        style: {type: String, required: true},
     }
 )
 

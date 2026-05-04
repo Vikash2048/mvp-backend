@@ -25,3 +25,9 @@ export const removeRefreshToken = async (userId, token) => {
 export const clearRefreshTokens = async (userId) => {
     await User.findByIdAndUpdate(userId, {$pull: {refreshTokens: []}});
 }
+
+export const updateAvatar = async (userId, avatarData) => {
+    return await User.findByIdAndUpdate(userId, {
+        avatar: avatarData,
+    })
+}

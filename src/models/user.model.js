@@ -23,8 +23,15 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
     avatar: {
-      type: String,
-      default: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+      type: {
+        type: String,
+        enum: ["system", "custom"],
+        default: "system",
+      },
+      seed: String,
+      style: String,
+      url: String, // ONLY STORE CUSTOM IMAGE URL NOT DICEBEAR AVATAR
+      publicId: String,  // Important in deletion
     },
 
     refreshTokens: [

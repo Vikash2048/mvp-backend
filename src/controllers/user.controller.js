@@ -10,6 +10,8 @@ import { createLogger } from "../utils/logger.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import * as userService from "../services/user.service.js";
 import * as jwtService from "../services/jwt.service.js";
+import * as avatarService from "../services/avatar.service.js";
+import AppError from "../utils/AppError.js";
 dotenv.config({ path: "./src/config/.env" });
 
 const client = twilio( process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN );
@@ -30,6 +32,34 @@ const sendOTP = catchAsync(async(req, res, next) => {
     message: "OTP sent successfully",
     requestId: req.requestId,
   });
+})
+
+/* GENERATE RANDOM AVATAR FROM DICEBEAR */  
+const getAvatarOptions = catchAsync(async(req, res, next) => {
+  req.log.info("Get avatar options request received");
+  const avatar = await avatarService.getAvatarOptions();
+  res.status(200).json({ success: true, data: avatar})
+});
+
+/* SELECT AVATAR FRM DICEBEAR */
+const selectAvatar = catchAsync(async(req, res, next) => {
+  req.log.info("Avatar selection request received");
+  const {seed, style} = req.body;
+  await avatarService.selectAvatar(req.user.id, seed, style);
+  res.json({success: true, message: "Avatar selected"});
+})
+
+/* UPLOAD CUSTOM IMAGE */
+const uploadAvatar = catchAsync(async(req, res, next) => {
+  req.log.info("Avatar upload request received");
+
+  if(!req.file){
+    throw new AppError("No file uploaded, image is missing", 400);
+  }
+
+  const imageUrl  = req.file;
+  await avatarService.uploadAvatar(req.user.id, imageUrl);
+  res.json({success: true, message: "Avatar uploaded"});
 })
 
 /* RANDOM AVATER FOR USER */
@@ -225,4 +255,4 @@ const updateStreak = async (req, res) => {
 };
 
 
-export { sendOTP,  getAvatars, updateUserProfile, getUserProfile, updateStreak };
+export { sendOTP,  getAvatars, updateUserProfile, getUserProfile, updateStreak , getAvatarOptions, selectAvatar, uploadAvatar};
