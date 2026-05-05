@@ -48,3 +48,19 @@ export const uploadAvatar = async (userId, file) => {
         avatarUrl : imageUrl,
     };
 };
+
+export const getAvatarUrl = async (avatar) => {
+    if (avatar.type === "custom") return avatar.url;
+
+    return `https://api.dicebear.com/7.x/${avatar.style}/png?seed=${avatar.seed}`;
+}
+
+export const removeAvatar = async (userId) => {
+    const user = await userRepo.findById(userId);
+
+    if(user.avatar?.type === "custom" && user.avatar.publicId) {
+        await cloudinary.uploader.destroy(user.avatar.publicId);
+    }
+
+    await userRepo.removeAvatar(user._id);
+}

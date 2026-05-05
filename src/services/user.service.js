@@ -33,6 +33,84 @@ export const sendOTP = async({phone}) => {
     // });
 
     return otp;  // for developement env only
+};
 
+// GETTING USER PROFILE
+export const getUserProfile = async(userId) => {
+    const user = await userRepo.findById(userId);
+    if (!user){
+        throw new AppError("User not found!", 404);
+    }
+
+    const userObj = user.toObject();
+    delete userObj.refreshTokens;
+    return userObj;
+}
+
+// UPDATE USER PROFILE
+export const updateUserProfile = async(userId, updateData) => {
+    const user = await userRepo.findById(userId);
+
+    if(!user){
+        throw new AppError("User not found", 404);
+    }
+
+    const checkData = {
+        name: updateData.name || user.name,
+        gender: updateData.gender || user.gender,
+        email: updateData.email || user.email,
+        AlternateNumber: updateData.AlternateNumber || user.AlternateNumber,
+        phone: user.phone, // phone is already required by schema
+        date_of_birth: updateData.date_of_birth || user.date_of_birth,
+    };
+
+    const isNowComplete = Object.values(checkData).every( (val) => val !== undefined && val !== "" && val !== "User");
+
+    const updateUser = await userRepo.updateById(userId, {
+        ...updateData,
+        profileCompleted: isNowComplete,
+    });
+
+    return updateUser;
+}
+
+// UPDATE STREAK
+export const updateStreak = async(userId) => {
+    const user = await userRepo.findById(userId);
+
+    if(!user){
+        throw new AppError("User not found", 404);
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    if(!user.lastActivityDate){
+        user.streak = 1;
+    } else {
+        const last = new Date(user.lastActivityDate);
+        const lastMidnight = new Date(
+            last.getFullYear(),
+            last.getMonth(),
+            last.getDate()
+        );
+
+        const diffDays = Math.ceil(Math.abs(today - lastMidnight) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) user.streak += 1;
+        else if (diffDays > 1) user.streak = 1;
+
+        if(user.streak > (user.highestStreak || 0)) {
+            user.highestStreak = user.streak;
+        }
+
+        user.lastActivityDate = now;
+
+        await user.save();
+        return {
+            streak: user.streak,
+            highestStreak: user.highestStreak,
+        };
+    };
 }
 

@@ -12,6 +12,7 @@ import { createLogger } from "./utils/logger.js";
 import { attachLogger } from "./middlewares/logger.middleware.js";
 import { requestContext } from "./middlewares/requestContext.js";
 import cookieParser from "cookie-parser";
+import { handleMulterError } from "./middlewares/multer.middleware.js";
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api/journals", journalRouter);
 app.use("/api/therapist", therapistRouter);
 app.use("/api/therapist-booking", therapistBookingRouter);
 
+app.use(handleMulterError);
 app.use(globalErrorHandler);
 
 export default app;

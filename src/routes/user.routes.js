@@ -10,9 +10,9 @@ const userRouter = express.Router();
 
 userRouter.post("/send-otp", sendOTP);
 userRouter.get("/avatars", getAvatarOptions);
-userRouter.get("/avatars/select", selectAvatar);
+userRouter.post("/avatars/select", authMiddleware, selectAvatar);
 userRouter.post("/avatars/upload", authMiddleware, upload.single("avatar"), uploadAvatar);
-userRouter.get("/my-profile", authMiddleware, getUserProfile);
-userRouter.put("/update-profile", authMiddleware, validateBody(userUpdateSchema), updateUserProfile);
-userRouter.get("/update-streak", authMiddleware, updateStreak);
+userRouter.get("/me", authMiddleware, getUserProfile);
+userRouter.patch("/me", authMiddleware, validateBody(userUpdateSchema), updateUserProfile);
+userRouter.post("/streak", authMiddleware, updateStreak);
 export default userRouter;

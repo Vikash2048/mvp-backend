@@ -31,3 +31,14 @@ export const updateAvatar = async (userId, avatarData) => {
         avatar: avatarData,
     })
 }
+
+export const removeAvatar = async (userId) => {
+    await User.findByIdAndUpdate(userId, {$pull: {avatar: {}}});
+}
+
+export const updateById = async (userId, data) => {
+    return await User.findByIdAndUpdate(userId,
+        { $set: data },
+        { new: true, runValidators: true }
+    ).select("-refreshTokens");
+};
