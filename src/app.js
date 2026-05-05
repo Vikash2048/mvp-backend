@@ -42,14 +42,17 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/tour-packages", tourPackageRoutes);
-app.use("/api/tour-slots", tourSlotRouter);
-app.use("/api/tour-booking", tourBookingRouter);
-app.use("/api/journals", journalRouter);
-app.use("/api/therapist", therapistRouter);
-app.use("/api/therapist-booking", therapistBookingRouter);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/auth", authRoutes);
+
+app.use("/api/v1/tour-packages", tourPackageRoutes);
+app.use("/api/v1/tour-slots", tourSlotRouter);
+app.use("/api/v1/tour-bookings", tourBookingRouter);
+
+app.use("/api/v1/journals", journalRouter);
+
+app.use("/api/v1/therapists", therapistRouter);
+app.use("/api/v1/therapist-booking", therapistBookingRouter);
 
 app.use(handleMulterError);
 app.use(globalErrorHandler);

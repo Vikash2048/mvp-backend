@@ -41,6 +41,22 @@ export const createTourPackageSchema = Joi.object({
   maxCapacity: Joi.number().integer().min(1).default(6),
 });
 
+export const updateTourPackageSchema = Joi.object({
+  title: Joi.string().trim().min(3),
+
+  description: Joi.string().trim().allow(""),
+
+  images: Joi.array().items(Joi.string().uri()).min(1),
+
+  location: Joi.string().trim(),
+
+  durationDays: Joi.number().integer().min(1),
+
+  pricePerSeat: Joi.number().positive(),
+
+  maxCapacity: Joi.number().integer().min(1),
+}).min(1); // VERY IMPORTANT mean at least one field must be provided
+
 export const createJournalSchema = Joi.object({
   content: Joi.string().trim().min(1).max(5000).required().messages({
     "string.base": "Content must be a string",

@@ -3,9 +3,41 @@ import { createLogger } from "../utils/logger.js";
 
 const logger = createLogger({ module: "retreats-controller" });
 
-/**
- * CREATE tour package
- */
+/* CREATE tour package */
+export const createTourPackage = catchAsync(async (req, res) => {
+  req.log.info("Create tour package request received");
+  const data = await tourService.createTourPackage(req.body);
+  res.status(201).json({success: true, data});
+});
+
+/* GET ALL */
+export const getAllTourPackages = catchAsync(async (req, res) => {
+  req.log.info("Get all tour packages request received");
+  const data = await tourService.getAllTourPackages(req.query);
+  res.json({success: true, data});
+});
+
+/* GET BY ID */
+export const getTourPackageById = catchAsync(async (req, res) => {
+  req.log.info("Get tour package by id request received");
+  const data = await tourService.getTourPackageById(req.params.id);
+  res.json({success: true, data});
+});
+
+/* UPDATE */
+export const updateTourPackage = catchAsync(async (req, res) => {
+  req.log.info("Update tour package hit");
+  const data = await tourService.updateTourPackage( req.params.id, req.body );
+  res.json({success: true, data});
+});
+
+/* DELETE */
+export const deleteTourPackage = catchAsync(async (req, res) => {
+  req.log.info("Delete tour package hit");
+  await tourService.deleteTourPackage(req.params.id);
+  res.status(204).json({success: true, message: "Package deleted"});
+});
+
 export const createTourPackage = async (req, res) => {
   try {
     logger.info(
