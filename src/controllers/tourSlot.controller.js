@@ -1,11 +1,42 @@
 import tourSlot from "../models/tourSlot.model.js";
-import { createLogger } from "../utils/logger.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
-const logger = createLogger({ module: "retreat-slot-controller" });
+/* CREATE */
+export const createTourSlot = catchAsync(async (req, res) => {
+  req.log.info("Create tour slot request received");
+  const data = await slotService.createTourSlot(req.body);
+  res.status(201).json({ success: true, data });
+})
 
-/**
- * CREATE slot
- */
+/* GET ALL */
+export const getAllTourSlots = catchAsync(async (req, res) => {
+  req.log.info("Get all tour slots request received");
+  const data = await slotService.getAllTourSlots(req.query);
+  res.json({ success: true, data });
+});
+
+/* GET BY ID */
+export const getTourSlotById = catchAsync(async (req, res) => {
+  req.log.info("Get tour slot by id request received");
+  const data = await slotService.getTourSlotById(req.params.id);
+  res.json({ success: true, data });
+});
+
+/* UPDATE */
+export const updateTourSlot = catchAsync(async (req, res) => {
+  req.log.info("Update tour slot request received");
+  const data = await slotService.updateTourSlot( req.params.id, req.body );
+  res.json({ success: true, data });
+});
+
+/* DELETE */
+export const deleteTourSlot = catchAsync(async (req, res) => {
+  req.log.info("Delete tour slot request, received");
+  await slotService.deleteTourSlot(req.params.id);
+  res.status(204).json({success: true, message: "Slot deleted"});
+});
+/*
+
 export const createTourSlot = async (req, res) => {
   try {
     logger.info({
@@ -15,7 +46,7 @@ export const createTourSlot = async (req, res) => {
       ip: req.ip,
     }, "Create tour slot handler hit");
     const slot = await tourSlot.create(req.body);
-
+    
     res.status(201).json({
       success: true,
       message: "Tour slot created successfully",
@@ -35,9 +66,7 @@ export const createTourSlot = async (req, res) => {
   }
 };
 
-/**
- * GET all slots
- */
+
 export const getAllTourSlots = async (req, res) => {
   try {
     logger.info({
@@ -47,17 +76,17 @@ export const getAllTourSlots = async (req, res) => {
       ip: req.ip,
     }, "Get all tour slots handler hit");
     const filter = {};
-
+    
     // Optional filter by package
     if (req.query.tourPackageId) {
       filter.tourPackageId = req.query.tourPackageId;
     }
-
+    
     const slots = await tourSlot
-      .find(filter)
-      .populate("tourPackageId", "title location")
-      .sort({ startDate: 1 });
-
+    .find(filter)
+    .populate("tourPackageId", "title location")
+    .sort({ startDate: 1 });
+    
     res.status(200).json({
       success: true,
       count: slots.length,
@@ -77,9 +106,6 @@ export const getAllTourSlots = async (req, res) => {
   }
 };
 
-/**
- * GET slot by ID
- */
 export const getTourSlotById = async (req, res) => {
   try {
     logger.info({
@@ -89,16 +115,16 @@ export const getTourSlotById = async (req, res) => {
       ip: req.ip,
     }, "Get tour slot by id handler hit");
     const slot = await tourSlot
-      .findById(req.params.id)
-      .populate("tourPackageId", "title location pricePerSeat");
-
+    .findById(req.params.id)
+    .populate("tourPackageId", "title location pricePerSeat");
+    
     if (!slot) {
       return res.status(404).json({
         success: false,
         message: "Tour slot not found",
       });
     }
-
+    
     res.status(200).json({
       success: true,
       data: slot,
@@ -117,9 +143,6 @@ export const getTourSlotById = async (req, res) => {
   }
 };
 
-/**
- * UPDATE slot
- */
 export const updateTourSlot = async (req, res) => {
   try {
     logger.info({
@@ -132,14 +155,14 @@ export const updateTourSlot = async (req, res) => {
       new: true,
       runValidators: true,
     });
-
+    
     if (!slot) {
       return res.status(404).json({
         success: false,
         message: "Tour slot not found",
       });
     }
-
+    
     res.status(200).json({
       success: true,
       message: "Tour slot updated successfully",
@@ -159,9 +182,6 @@ export const updateTourSlot = async (req, res) => {
   }
 };
 
-/**
- * DELETE slot
- */
 export const deleteTourSlot = async (req, res) => {
   try {
     logger.info({
@@ -171,14 +191,14 @@ export const deleteTourSlot = async (req, res) => {
       ip: req.ip,
     }, "Delete tour slot handler hit");
     const slot = await tourSlot.findByIdAndDelete(req.params.id);
-
+    
     if (!slot) {
       return res.status(404).json({
         success: false,
         message: "Tour slot not found",
       });
     }
-
+    
     res.status(200).json({
       success: true,
       message: "Tour slot deleted successfully",
@@ -196,3 +216,5 @@ export const deleteTourSlot = async (req, res) => {
     });
   }
 };
+
+*/

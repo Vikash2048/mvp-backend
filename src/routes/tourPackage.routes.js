@@ -5,7 +5,7 @@ import {
   getTourPackageById,
   updateTourPackage,
   deleteTourPackage,
-} from "../controllers/retreats.controller.js";
+} from "../controllers/tourPackage.controller.js";
 import { createTourPackageSchema, validateBody, updateTourPackageSchema } from "../middlewares/validation.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { isAdmin } from "../middlewares/admin.middleware.js";
@@ -24,7 +24,7 @@ router
 
 router
   .route("/:id")
-  .get(getTourPackageById) // ✅ public
+  .get(getTourPackageById) // public
   .patch(
     authMiddleware,
     isAdmin,

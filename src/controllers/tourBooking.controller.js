@@ -5,11 +5,49 @@ import { sendRetreatRequestMail } from "../utils/mailService.js";
 import tourPackage from "../models/tourPackage.model.js";
 import { createLogger } from "../utils/logger.js";
 
-const logger = createLogger({ module: "retreat-booking-controller" });
 
-/**
- * CREATE booking (ATOMIC)
- */
+/* CREATE */
+export const createBooking = catchAsync(async (req, res) => {
+  req.log.info("Create booking request received");
+  const data = await bookingService.createBooking( req.user.id, req.body );
+  res.status(201).json({ success: true, data });
+});
+
+
+/* GET ALL BOOKING */
+export const getAllBookings = catchAsync(async (req, res) => {
+  req.log.info("Get bookings request received");
+  const data = await bookingService.getAllBookings( req.user, req.query );
+  res.json({ success: true, data });
+})
+
+/* GET BY ID */
+export const getBookingById = catchAsync(async (req, res) => {
+  req.log.info("Get booking by id request received");
+  const data = await bookingService.getBookingById( req.user, req.params.id );
+  res.json({ success: true, data });
+});
+
+/* CANCEL */
+export const cancelBooking = catchAsync(async (req, res) => {
+  req.log.info("Cancel booking request received");
+  await bookingService.cancelBooking( req.user, req.params.id );
+  res.json({ success: true, message: "Booking cancelled successfully" });
+});
+
+/* CONFIRM BOOKING */
+export const confirmBooking = async (req, res, next) => {
+  try {
+    req.log.info("Confirm booking request received");
+    const data = await bookingService.confirmBooking(req.params.id);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+/*
 export const createBooking = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -19,10 +57,10 @@ export const createBooking = async (req, res) => {
       method: req.method,
       endpoint: `${req.method} ${req.originalUrl}`,
       ip: req.ip,
-    }, "Retreat booking create handler hit");
-    const {  tourPackageId, tourSlotId, seatsBooked, totalAmount,email,name,phone } =
-      req.body;
-const userId = req?.user?.id ;
+      }, "Retreat booking create handler hit");
+      const {  tourPackageId, tourSlotId, seatsBooked, totalAmount,email,name,phone } =
+    req.body;
+    const userId = req?.user?.id ;
     // Atomic seat check + update
     const slot = await TourSlot.findOneAndUpdate(
       {
@@ -40,7 +78,7 @@ const userId = req?.user?.id ;
     if (!slot) {
       throw new Error("Not enough seats available");
     }
-
+    
     const booking = await RetreatBooking.create(
       [
         {
@@ -53,17 +91,17 @@ const userId = req?.user?.id ;
       ],
       { session },
     );
-
+    
     await session.commitTransaction();
     session.endSession();
     const packageInfo = await tourPackage.findById(tourPackageId);
     await sendRetreatRequestMail(email, name, packageInfo.title, seatsBooked, totalAmount, slot.startDate,phone);
-
-   res.status(201).json({
+    
+    res.status(201).json({
      success: true,
      message: "Booking Request Raised Successfully",
      data: booking[0],
-   });
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -73,7 +111,7 @@ const userId = req?.user?.id ;
       endpoint: `${req.method} ${req.originalUrl}`,
       ip: req.ip,
     });
-
+    
     res.status(400).json({
       success: false,
       message: error.message,
@@ -81,9 +119,6 @@ const userId = req?.user?.id ;
   }
 };
 
-/**
- * GET all bookings
- */
 export const getAllBookings = async (req, res) => {
   try {
     logger.info({
@@ -105,10 +140,10 @@ export const getAllBookings = async (req, res) => {
       filter.tourSlotId = req.query.tourSlotId;
     }
     const bookings = await RetreatBooking.find(filter)
-      .populate("tourPackageId", "title location images")
-      .populate("tourSlotId", "startDate endDate")
-      .sort({ createdAt: -1 });
-
+    .populate("tourPackageId", "title location images")
+    .populate("tourSlotId", "startDate endDate")
+    .sort({ createdAt: -1 });
+    
     res.status(200).json({
       success: true,
       count: bookings.length,
@@ -128,9 +163,6 @@ export const getAllBookings = async (req, res) => {
   }
 };
 
-/**
- * GET booking by ID
- */
 export const getBookingById = async (req, res) => {
   try {
     logger.info({
@@ -140,9 +172,9 @@ export const getBookingById = async (req, res) => {
       ip: req.ip,
     }, "Retreat booking detail handler hit");
     const booking = await RetreatBooking.findById(req.params.id)
-      .populate("tourPackageId")
-      .populate("tourSlotId");
-
+    .populate("tourPackageId")
+    .populate("tourSlotId");
+    
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -168,13 +200,10 @@ export const getBookingById = async (req, res) => {
   }
 };
 
-/**
- * CANCEL booking
- */
 export const cancelBooking = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
+  
   try {
     logger.info({
       functionName: "cancelBooking",
@@ -185,24 +214,24 @@ export const cancelBooking = async (req, res) => {
     const booking = await RetreatBooking.findById(req.params.id).session(
       session,
     );
-
+    
     if (!booking || booking.status === "CANCELLED") {
       throw new Error("Invalid booking");
     }
-
+    
     // Rollback seats
     await TourSlot.updateOne(
       { _id: booking.tourSlotId },
       { $inc: { bookedSeats: -booking.seatsBooked } },
       { session },
     );
-
+    
     booking.status = "CANCELLED";
     await booking.save({ session });
-
+    
     await session.commitTransaction();
     session.endSession();
-
+    
     res.status(200).json({
       success: true,
       message: "Booking cancelled",
@@ -216,7 +245,7 @@ export const cancelBooking = async (req, res) => {
       endpoint: `${req.method} ${req.originalUrl}`,
       ip: req.ip,
     });
-
+    
     res.status(400).json({
       success: false,
       message: error.message,
@@ -227,7 +256,7 @@ export const cancelBooking = async (req, res) => {
 export const confirmedBooking = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
+  
   try {
     logger.info({
       functionName: "confirmedBooking",
@@ -238,18 +267,18 @@ export const confirmedBooking = async (req, res) => {
     const booking = await RetreatBooking.findById(req.params.id).session(
       session,
     );
-
+    
     if (!booking || booking.status === "CONFIRMED") {
       throw new Error("Invalid booking");
     }
-
-
+    
+    
     booking.status = "CONFIRMED";
     await booking.save({ session });
-
+    
     await session.commitTransaction();
     session.endSession();
-
+    
     res.status(200).json({
       success: true,
       message: "Booking Confirmed",
@@ -263,10 +292,12 @@ export const confirmedBooking = async (req, res) => {
       endpoint: `${req.method} ${req.originalUrl}`,
       ip: req.ip,
     });
-
+    
     res.status(400).json({
       success: false,
       message: error.message,
     });
   }
 };
+
+*/

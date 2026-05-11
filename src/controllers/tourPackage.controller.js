@@ -1,5 +1,7 @@
 import TourPackage from "../models/tourPackage.model.js";
 import { createLogger } from "../utils/logger.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import * as tourService from "../services/tourPackage.service.js";
 
 const logger = createLogger({ module: "retreats-controller" });
 
@@ -38,6 +40,8 @@ export const deleteTourPackage = catchAsync(async (req, res) => {
   res.status(204).json({success: true, message: "Package deleted"});
 });
 
+/*
+
 export const createTourPackage = async (req, res) => {
   try {
     logger.info(
@@ -50,7 +54,7 @@ export const createTourPackage = async (req, res) => {
       "Create tour package handler hit",
     );
     const tour = await TourPackage.create(req.body);
-
+    
     res.status(201).json({
       success: true,
       message: "Tour package created successfully",
@@ -70,9 +74,6 @@ export const createTourPackage = async (req, res) => {
   }
 };
 
-/**
- * GET all tour packages
- */
 export const getAllTourPackages = async (req, res) => {
   try {
     logger.info(
@@ -104,9 +105,6 @@ export const getAllTourPackages = async (req, res) => {
   }
 };
 
-/**
- * GET tour package by ID
- */
 export const getTourPackageById = async (req, res) => {
   try {
     logger.info(
@@ -121,7 +119,7 @@ export const getTourPackageById = async (req, res) => {
     const { id } = req.params;
 
     const tour = await TourPackage.findById(id);
-
+    
     if (!tour) {
       return res.status(404).json({
         success: false,
@@ -147,14 +145,12 @@ export const getTourPackageById = async (req, res) => {
   }
 };
 
-/**
- * UPDATE tour package
- */
 export const updateTourPackage = async (req, res) => {
   try {
     logger.info(
       {
         functionName: "updateTourPackage",
+        
         method: req.method,
         endpoint: `${req.method} ${req.originalUrl}`,
         ip: req.ip,
@@ -162,19 +158,19 @@ export const updateTourPackage = async (req, res) => {
       "Update tour package handler hit",
     );
     const { id } = req.params;
-
+    
     const updatedTour = await TourPackage.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
     });
-
+    
     if (!updatedTour) {
       return res.status(404).json({
         success: false,
         message: "Tour package not found",
       });
     }
-
+    
     res.status(200).json({
       success: true,
       message: "Tour package updated successfully",
@@ -194,9 +190,6 @@ export const updateTourPackage = async (req, res) => {
   }
 };
 
-/**
- * DELETE tour package
- */
 export const deleteTourPackage = async (req, res) => {
   try {
     logger.info(
@@ -209,16 +202,16 @@ export const deleteTourPackage = async (req, res) => {
       "Delete tour package handler hit",
     );
     const { id } = req.params;
-
+    
     const deletedTour = await TourPackage.findByIdAndDelete(id);
-
+    
     if (!deletedTour) {
       return res.status(404).json({
         success: false,
         message: "Tour package not found",
       });
     }
-
+    
     res.status(200).json({
       success: true,
       message: "Tour package deleted successfully",
@@ -236,3 +229,5 @@ export const deleteTourPackage = async (req, res) => {
     });
   }
 };
+
+*/

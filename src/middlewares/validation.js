@@ -57,12 +57,24 @@ export const updateTourPackageSchema = Joi.object({
   maxCapacity: Joi.number().integer().min(1),
 }).min(1); // VERY IMPORTANT mean at least one field must be provided
 
+export const updateTourSlotSchema = Joi.object({
+  packageId: Joi.string(),
+
+  startDate: Joi.date(),
+  endDate: Joi.date(),
+
+  availableSeats: Joi.number().integer().min(0),
+
+  price: Joi.number().positive(),
+}).min(1);
+
 export const createJournalSchema = Joi.object({
   content: Joi.string().trim().min(1).max(5000).required().messages({
     "string.base": "Content must be a string",
     "string.empty": "Content cannot be empty",
     "any.required": "Content is required",
   }),
+  
 
   mood: Joi.string()
     .valid("HAPPY", "NEUTRAL", "SAD", "ANXIOUS","OK","ANGRY","OTHER")
