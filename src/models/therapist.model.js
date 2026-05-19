@@ -1,78 +1,105 @@
 import mongoose from "mongoose";
-const therapistSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  available_today: {
-    type: Boolean,
-    default: false,
-    },
-    price_per_session: {
-    type: Number,
-    required: true,
-    },
-    description: {
-    type: String,
-    maxlength: 500,
-    },
-  rating: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0,
-  },
-  language: {
-    type: [String],
-    default: ["English", "Hindi"],
-  },
-  // Array of strings for easy filtering/tagging
-  speciality: [
-    {
+
+const therapistSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
-      default: [
-        "Anxiety",
-        "Overthinking",
-        "Phobias",
-        "Sexual Well-being",
-        "Stress",
-        "Depression",
-        "Trauma",
-        "Relationship Issues",
-      ],
+      required: true,
+      trim: true,
+      maxlength: 100,
     },
-  ],
-  // Array of objects for structured background
-  education_and_experience: [
-    {
-      category: { type: String, enum: ["Education", "Experience"] },
-      title: String, // e.g., "M.Sc. in Psychology" or "Clinical Lead"
-      organization: String,
-      year_or_duration: String,
+
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
     },
-  ],
-  available_slots: [
-    {
-      type: String, // e.g., "14:00", "15:30"
+
+    image: {
+      type: String,
+      default:
+        "https://api.dicebear.com/7.x/avataaars/png?seed=therapist",
     },
-  ],
-  created_at: {
-    type: Date,
-    default: Date.now,
+
+    pricePerSession: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 0,
+    },
+
+    languages: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+
+    specialties: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+
+    educationAndExperience: [
+      {
+        category: {
+          type: String,
+          enum: ["Education", "Experience"],
+        },
+        title: String,
+        organization: String,
+        yearOrDuration: String,
+      },
+    ],
+
+    weeklyAvailability: [
+      {
+        dayOfWeek: {
+          type: Number,
+          min: 0,
+          max: 6,
+        },
+        startTime: String,
+        endTime: String,
+      },
+    ],
+
+    status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED"],
+      default: "ACTIVE",
+      index: true,
+    },
   },
-  status: {
-    type: String,
-    default: "active",
-    enum: ["active", "suspended"],
-  },
-  image: {
-    type: String,
-    default: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-  },
+  {
+    timestamps: true,
+  }
+);
+
+
+
+// ✅ SEARCH INDEX
+therapistSchema.index({
+  name: "text",
+  specialties: "text",
 });
 
 
-const Therapist = mongoose.model("Therapist", therapistSchema);
 
-export default Therapist;
+// ✅ FILTER INDEX
+therapistSchema.index({
+  status: 1,
+  rating: -1,
+});
+
+
+
+export default mongoose.model( "Therapist", therapistSchema );

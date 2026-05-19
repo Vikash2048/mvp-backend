@@ -4,6 +4,7 @@ import TourSlot from "../models/tourSlot.model.js";
 import { sendRetreatRequestMail } from "../utils/mailService.js";
 import tourPackage from "../models/tourPackage.model.js";
 import { createLogger } from "../utils/logger.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 
 /* CREATE */

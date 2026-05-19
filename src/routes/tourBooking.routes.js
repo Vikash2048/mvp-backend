@@ -4,7 +4,6 @@ import {
   getAllBookings,
   getBookingById,
   cancelBooking,
-  confirmedBooking,
   confirmBooking,
 } from "../controllers/tourBooking.controller.js";
 import { createBookingSchema, validateBody } from "../middlewares/validation.js";
@@ -45,4 +44,4 @@ retreatBookingRouter.patch("/:id/cancel", cancelBooking);
 retreatBookingRouter.patch("/:id/confirm", confirmedBooking);
 */
 
-export default retreatBookingRouter;
+export default router;

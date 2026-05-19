@@ -223,3 +223,98 @@ export const validateBody = (schema) => (req, res, next) => {
   }
   next();
 };
+
+
+export const createTherapyBookingSchema =
+  Joi.object({
+    therapistId: Joi.string()
+      .hex()
+      .length(24)
+      .required(),
+
+    slotDate: Joi.date()
+      .iso()
+      .required(),
+
+    slotTime: Joi.string()
+      .pattern(
+        /^([01]\d|2[0-3]):([0-5]\d)$/
+      )
+      .required(),
+
+    timezone: Joi.string()
+      .default("Asia/Kolkata"),
+
+    name: Joi.string()
+      .trim()
+      .min(2)
+      .max(100)
+      .required(),
+
+    email: Joi.string()
+      .email()
+      .trim()
+      .lowercase()
+      .required(),
+
+    phone: Joi.string()
+      .trim()
+      .min(8)
+      .max(15)
+      .required(),
+
+    age: Joi.number()
+      .min(1)
+      .max(120)
+      .optional(),
+
+    gender: Joi.string()
+      .valid(
+        "MALE",
+        "FEMALE",
+        "OTHER"
+      )
+      .optional(),
+
+    concern: Joi.string()
+      .trim()
+      .max(1000)
+      .optional(),
+
+    languagePreference:
+      Joi.string().optional(),
+  });
+
+export const confirmBookingSchema =
+  Joi.object({
+    paymentProvider:
+      Joi.string()
+        .valid(
+          "RAZORPAY",
+          "STRIPE"
+        )
+        .required(),
+
+    paymentOrderId:
+      Joi.string()
+        .trim()
+        .required(),
+
+    paymentId:
+      Joi.string()
+        .trim()
+        .required(),
+
+    transactionId:
+      Joi.string()
+        .trim()
+        .optional(),
+  });
+
+  export const cancelBookingSchema =
+  Joi.object({
+    reason: Joi.string()
+      .trim()
+      .max(500)
+      .optional(),
+  });

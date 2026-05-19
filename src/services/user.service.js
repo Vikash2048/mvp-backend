@@ -106,11 +106,11 @@ export const updateStreak = async(userId) => {
 
         user.lastActivityDate = now;
 
-        await user.save();
-        return {
-            streak: user.streak,
-            highestStreak: user.highestStreak,
-        };
+    };
+    await user.save();
+    return {
+        streak: user.streak,
+        highestStreak: user.highestStreak,
     };
 }
 

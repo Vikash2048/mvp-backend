@@ -31,7 +31,7 @@ router
     validateBody(updateTourSlotSchema),
     updateTourSlot
   )
-  .delete(authMiddleware, isAdmin, deleteTourSlot);
+  .delete(authMiddleware, authMiddleware, isAdmin, deleteTourSlot);
 
 /*
 // CREATE

@@ -5,7 +5,7 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 const authRouter = express.Router();
 
 authRouter.post("/verify-otp", verifyOTP);
-authRouter.post("/refresh-token", refreshedAccessToken);
+authRouter.post("/refresh-token", authMiddleware, refreshedAccessToken);
 authRouter.post("/logout", authMiddleware, logout);
 authRouter.post("/logout-all", authMiddleware, logoutAllDevice);
 

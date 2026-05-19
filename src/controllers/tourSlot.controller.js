@@ -1,5 +1,5 @@
-import tourSlot from "../models/tourSlot.model.js";
 import { catchAsync } from "../utils/catchAsync.js";
+import * as slotService from "../services/tourSlot.service.js"
 
 /* CREATE */
 export const createTourSlot = catchAsync(async (req, res) => {
